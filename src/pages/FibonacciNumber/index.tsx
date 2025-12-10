@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import PageHeader from '../../components/Shared/PageHeader';
+import FlexCol from '../../components/Boxes/FlexCol';
+import FlexCenter from '../../components/Boxes/FlexCenter';
 
 export interface IFibonacciNumberProps {}
 
@@ -6,6 +9,7 @@ export default function FibonacciNumber(props: IFibonacciNumberProps) {
   const [fibonacciNumber, setFibonacciNumber] = useState(20);
   const [interateNumber, setInterateNumber] = useState(0);
   const [arrPrevious, setArrPrevious] = useState([0, 1]);
+  const [computing, setComputing] = useState(false);
 
   const handleChangeFibonacciNumber = (value: string) => {
     const numericValue = +value.replace(/\D/g, '');
@@ -18,7 +22,12 @@ export default function FibonacciNumber(props: IFibonacciNumberProps) {
   };
 
   useEffect(() => {
-    if (interateNumber < 2 || interateNumber > fibonacciNumber) return;
+    if (interateNumber < 2 || interateNumber > fibonacciNumber) {
+      setComputing(false);
+      return;
+    }
+
+    if (!computing) setComputing(true);
 
     const nextNumber =
       arrPrevious[interateNumber - 1] + arrPrevious[interateNumber - 2];
@@ -26,15 +35,16 @@ export default function FibonacciNumber(props: IFibonacciNumberProps) {
     setTimeout(() => {
       setArrPrevious((prev) => [...prev, nextNumber]);
       setInterateNumber((prev) => prev + 1);
-    }, 150);
+    }, 100);
   }, [interateNumber]);
 
   return (
     <div className="flex flex-col bg-fuchsia-950 text-white w-screen h-screen overflow-y-auto">
-      <div className="flex justify-center items-center w-full py-8">
-        <p className="text-2xl font-bold">Fibonacci Number</p>
-      </div>
+      <PageHeader title="Fibonacci Number" />
       <div className="flex flex-col gap-4 flex-1">
+        <FlexCenter>
+          <p>Descrição</p>
+        </FlexCenter>
         <div className="flex justify-center items-center gap-4">
           <div className="flex justify-center items-center gap-2">
             <span className="text-3xl">Fn =</span>
@@ -51,6 +61,7 @@ export default function FibonacciNumber(props: IFibonacciNumberProps) {
           <div>
             <button
               onClick={handleComputeFibonacciNumber}
+              disabled={computing}
               className="
                 bg-fuchsia-700 
                 hover:bg-fuchsia-600 
@@ -59,12 +70,13 @@ export default function FibonacciNumber(props: IFibonacciNumberProps) {
                 rounded-lg
                 cursor-pointer
               "
+              style={{ cursor: computing ? 'not-allowed' : 'pointer' }}
             >
-              Calcular
+              {computing ? 'Calculando...' : 'Calcular'}
             </button>
           </div>
         </div>
-        <div className="flex flex-wrap border-2 p-4 border-fuchsia-700 rounded-lg m-4">
+        <FlexCol className="flex-col-reverse border-2 p-4 border-fuchsia-700 rounded-lg m-4">
           {arrPrevious.map((value, index) => {
             const border =
               arrPrevious.length - 1 === index
@@ -81,7 +93,7 @@ export default function FibonacciNumber(props: IFibonacciNumberProps) {
               </div>
             );
           })}
-        </div>
+        </FlexCol>
       </div>
     </div>
   );
